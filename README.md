@@ -6,11 +6,14 @@ Dupla: Ramon Fontana de Souza e João Paulo Souza Selvati.
 
 ## Tarefas do teste de usabilidade
 
-1. Encontrar um restaurante aberto agora e ver como chegar.
-2. Encontrar a Feira de Sabores de Lavras e ativar o aviso do evento.
-3. Encontrar uma rota de bike curta e fácil, ver distância e paradas e salvar nos favoritos.
+1. Escolher um lugar para comer sem gastar muito.
+2. Conferir o horário e o preço médio do restaurante Sabor Mineiro.
+3. Descobrir como chegar ao Sabor Mineiro e quanto tempo leva.
+4. Encontrar uma trilha ou cachoeira perto de Lavras sem cobrança de entrada.
+5. Configurar avisos de eventos de cultura e de gastronomia.
+6. Consultar o endereço e o horário da feira gastronômica e salvar o evento.
 
-No protótipo, o horário é fixo (sábado, 19:30) e o usuário é sempre "Usuário 1", para que todos os participantes vejam o mesmo conteúdo.
+No protótipo, o horário é fixo (sábado, 15:00) e o usuário é sempre "Usuário 1", para que todos os participantes vejam o mesmo conteúdo.
 
 ## Como rodar
 

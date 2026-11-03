@@ -99,12 +99,15 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-a
 .passos{list-style:none;counter-reset:p}
 .passos li{counter-increment:p;display:flex;gap:10px;padding:9px 0;font-size:14px;border-bottom:1px solid var(--linha)}
 .passos li::before{content:counter(p);width:24px;height:24px;border-radius:50%;background:var(--verde-claro);color:var(--verde);font-weight:800;font-size:12px;display:grid;place-items:center;flex:none}
+.sw{width:44px;height:26px;border-radius:99px;background:#CFD4CF;position:relative;flex:none;transition:.2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.sw.on{background:var(--verde)}.sw.on::after{left:21px}
 .nota{font-size:11.5px;color:var(--suave);margin-top:14px;line-height:1.5}
 </style>
 </head>
 <body>
 <div class="phone" id="phone">
-  <div class="status"><span>19:30</span><span>Sáb ▪ 4G ▪ 82%</span></div>
+  <div class="status"><span>15:00</span><span>Sáb ▪ 4G ▪ 82%</span></div>
   <div class="topbar" id="topbar"></div>
   <div class="content" id="content"></div>
   <nav class="tabbar" id="tabbar"></nav>
@@ -119,26 +122,36 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-a
    Rotas: dados técnicos da Fase 3 dos relatórios da ADDTUR (2024).
    Horários, preços, distâncias e eventos: dados fixos de exemplo
    para os testes de usabilidade. Edite aqui para trocar o conteúdo.
-   "Agora" no protótipo é sempre sábado, 19:30.
+   "Agora" no protótipo é sempre sábado, 15:00.
    ========================================================= */
 const LUGARES = {
+  sabormineiro:{tipo:'restaurante', nome:'Sabor Mineiro', icone:'🥘', cor:'#FBE3C8', categoria:'Comida mineira caseira',
+    aberto:true, horario:'Todos os dias, 11h às 22h', fechaEm:'Fecha às 22h', preco:'$$', precoTxt:'preço médio de R$ 35 por pessoa',
+    distancia:'1,2 km', endereco:'Rua Santana, 210, Centro', x:140, y:122, natureza:false,
+    chegar:{carro:'5 min', bike:'7 min', ape:'15 min'},
+    passos:['Siga em frente pela rua principal por 600 m','Vire à direita na Praça Dr. Augusto Silva','Siga mais 2 quadras pela Rua Santana','O restaurante fica à esquerda, no número 210']},
+  cruzes:{tipo:'local', nome:'Cachoeira dos Cruzes', icone:'🏞️', cor:'#D8EEE6', categoria:'Natureza: trilha curta e cachoeira',
+    aberto:true, horario:'Acesso livre, melhor visitar de dia', fechaEm:'Acesso livre', preco:'Grátis', precoTxt:'Sem cobrança de entrada',
+    distancia:'16 km', endereco:'Zona rural, na Rota da Serra da Bocaina', x:212, y:40, natureza:true,
+    chegar:{carro:'25 min', bike:'1h10', ape:'Longe para ir a pé'},
+    passos:['Saia do centro em direção à Serra da Bocaina','Depois de 12 km, entre na estrada de terra à direita','Estacione na entrada da trilha','Caminhe 10 minutos pela trilha até a cachoeira']},
   timbore:{tipo:'restaurante', nome:'Bar do Timboré', icone:'🍲', cor:'#FCE7CF', categoria:'Comida mineira e petiscos',
     aberto:true, horario:'Terça a domingo, 11h às 23h', fechaEm:'Fecha às 23h', preco:'$$', precoTxt:'R$ 30 a 60 por pessoa',
     distancia:'12 km', endereco:'Comunidade do Funil, na Rota do Lago do Funil', x:92, y:104,
     chegar:{carro:'18 min', bike:'50 min', ape:'Longe para ir a pé'},
     passos:['Saia do centro pela Av. Dr. Sylvio Menicucci','Siga as placas para a Comunidade do Funil','O bar fica à direita, depois da igreja da comunidade']},
   celia:{tipo:'restaurante', nome:'Bar da Célia', icone:'🍺', cor:'#FDE9C9', categoria:'Bar e comida caseira',
-    aberto:true, horario:'Sexta a domingo, 17h às 22h', fechaEm:'Fecha às 22h', preco:'$', precoTxt:'até R$ 30 por pessoa',
+    aberto:false, horario:'Sexta a domingo, 17h às 22h', fechaEm:'Abre hoje às 17h', preco:'$', precoTxt:'até R$ 30 por pessoa',
     distancia:'14 km', endereco:'Comunidade do Funil, na Rota do Lago do Funil', x:66, y:136,
     chegar:{carro:'20 min', bike:'55 min', ape:'Longe para ir a pé'},
     passos:['Saia do centro em direção ao Funil','Passe pelo Bar do Timboré e siga por mais 2 km','O bar fica na praça da comunidade']},
   mercado:{tipo:'restaurante', nome:'Mercado Municipal de Lavras', icone:'🧺', cor:'#E5F0D8', categoria:'Comidas típicas, queijos e cafés',
-    aberto:false, horario:'Segunda a sábado, 7h às 18h', fechaEm:'Abre segunda às 7h', preco:'$', precoTxt:'até R$ 30 por pessoa',
+    aberto:true, horario:'Segunda a sábado, 7h às 18h', fechaEm:'Fecha às 18h', preco:'$', precoTxt:'até R$ 30 por pessoa',
     distancia:'0,8 km', endereco:'Centro de Lavras', x:204, y:116,
     chegar:{carro:'4 min', bike:'5 min', ape:'11 min'},
     passos:['Siga pela rua principal do centro','Vire na praça central','O mercado fica a uma quadra da praça']},
   belavista:{tipo:'restaurante', nome:'Restaurante Bela Vista', icone:'🍛', cor:'#F6E3D3', categoria:'Comida mineira no fogão a lenha',
-    aberto:false, horario:'Sábado e domingo, 11h às 16h', fechaEm:'Abre domingo às 11h', preco:'$$', precoTxt:'R$ 30 a 60 por pessoa',
+    aberto:true, horario:'Sábado e domingo, 11h às 16h', fechaEm:'Fecha às 16h', preco:'$$', precoTxt:'R$ 30 a 60 por pessoa',
     distancia:'18 km', endereco:'Na Rota da Serra da Bocaina', x:286, y:92,
     chegar:{carro:'25 min', bike:'1h20', ape:'Longe para ir a pé'},
     passos:['Saia do centro em direção à Serra da Bocaina','Siga a estrada de terra por 9 km','O restaurante fica no alto, à esquerda']},
@@ -150,21 +163,21 @@ const LUGARES = {
     aberto:false, horario:'Terça a sexta, 9h às 17h', fechaEm:'Abre terça às 9h', preco:'Grátis', precoTxt:'Entrada gratuita',
     distancia:'0,6 km', endereco:'Centro de Lavras', x:222, y:150,
     chegar:{carro:'3 min', bike:'4 min', ape:'8 min'}, passos:['Siga pela rua principal do centro','A Casa da Cultura fica perto da praça central']},
-  riobonito:{tipo:'local', nome:'Parque Quedas do Rio Bonito', icone:'💧', cor:'#DCEFF5', categoria:'Natureza, trilhas e cachoeiras',
-    aberto:false, horario:'Todos os dias, 8h às 17h', fechaEm:'Abre amanhã às 8h', preco:'$', precoTxt:'Entrada paga (consulte o valor)',
+  riobonito:{tipo:'local', nome:'Parque Quedas do Rio Bonito', icone:'💧', cor:'#DCEFF5', categoria:'Natureza, trilhas e cachoeiras', natureza:true,
+    aberto:true, horario:'Todos os dias, 8h às 17h', fechaEm:'Fecha às 17h', preco:'$', precoTxt:'Entrada paga: R$ 20 por pessoa',
     distancia:'14 km', endereco:'Na Rota da Serra da Bocaina', x:248, y:62,
     chegar:{carro:'22 min', bike:'1h', ape:'Longe para ir a pé'}, passos:['Saia do centro em direção à Serra da Bocaina','Siga as placas do parque']},
 };
 
 const EVENTOS = {
   feira:{nome:'Feira de Sabores de Lavras', icone:'🧀', cor:'#FCEFCB', quando:'Sábado, 14/11', hora:'9h às 14h',
-    lugar:'Mercado Municipal de Lavras', preco:'Entrada gratuita', categoria:'Gastronomia',
-    texto:'Produtores da região com queijos, cafés especiais, doces e comida mineira. Música ao vivo a partir das 11h.'},
+    lugar:'Praça Dr. Augusto Silva, Centro', preco:'Entrada gratuita', categoria:'Gastronomia', catKey:'gastronomia',
+    texto:'Feira gastronômica no centro de Lavras: produtores da região com queijos, cafés especiais, doces e comida mineira. Música ao vivo a partir das 11h.'},
   pedal:{nome:'Pedal de lançamento do Vale dos Ipês', icone:'🚴', cor:'#E2EFE7', quando:'Domingo, 15/11', hora:'7h30',
-    lugar:'Saída do Museu Bi Moreira (UFLA)', preco:'Gratuito, vagas limitadas', categoria:'Esporte e lazer',
+    lugar:'Saída do Museu Bi Moreira (UFLA)', preco:'Gratuito, vagas limitadas', categoria:'Esporte e lazer', catKey:'esporte',
     texto:'Passeio guiado pela Rota do Aeroporto (20,6 km), com apoio e paradas para hidratação.'},
   expo:{nome:'Exposição de artistas lavrenses', icone:'🖼️', cor:'#EFE6F6', quando:'Até 30/11', hora:'Terça a sexta, 9h às 17h',
-    lugar:'Casa da Cultura', preco:'Entrada gratuita', categoria:'Cultura',
+    lugar:'Casa da Cultura, Centro', preco:'Entrada gratuita', categoria:'Cultura', catKey:'cultura',
     texto:'Pinturas e fotografias de artistas da cidade sobre as paisagens e a história de Lavras.'},
 };
 
@@ -191,9 +204,11 @@ const ROTAS = {
     paradas:[['Museu Bi Moreira','Marco zero'],['Serra do Farias','Natureza'],['Fazenda Farias','Cafés especiais, com agendamento'],['Cachoeira do Farias','Natureza'],['Estação Ferroviária do Cervo','Patrimônio ferroviário'],['Pedra do Urubu','Natureza']]},
 };
 const ORDEM_ROTAS=['aeroporto','funil','bocaina','farias'];
+const CATEGORIAS=[['gastronomia','🍴','Gastronomia','Feiras, festivais e restaurantes'],['cultura','🎭','Cultura','Exposições, shows e teatro'],
+  ['esporte','🚴','Esporte e lazer','Pedais, corridas e passeios'],['natureza','🏞️','Natureza','Trilhas e atividades ao ar livre']];
 
 /* ===================== ESTADO ===================== */
-const estado={ pilha:[{tela:'inicio'}], favoritos:new Set(), avisos:new Set(), filtro:'todos', filtroMapa:'todos', modo:'carro', busca:'' };
+const estado={ pilha:[{tela:'inicio'}], favoritos:new Set(), avisos:new Set(), catAvisos:new Set(), antecedencia:'1 dia antes', filtroLocais:'todos', filtro:'todos', filtroMapa:'todos', modo:'carro', busca:'' };
 const $=s=>document.querySelector(s);
 
 function ir(tela,params={}){estado.pilha.push({tela,...params});render();$('#content').scrollTop=0}
@@ -247,7 +262,7 @@ const TELAS={
      <div class="atalhos">
       <button class="atalho" onclick="ir('restaurantes')"><span class="i">🍴</span><b>Restaurantes</b><span>Onde comer agora</span></button>
       <button class="atalho" onclick="ir('eventos')"><span class="i">📅</span><b>Eventos</b><span>O que vai acontecer</span></button>
-      <button class="atalho" onclick="ir('locais')"><span class="i">📍</span><b>Locais</b><span>Museus, parques e cultura</span></button>
+      <button class="atalho" onclick="ir('locais')"><span class="i">📍</span><b>Locais</b><span>Natureza, museus e cultura</span></button>
       <button class="atalho" onclick="ir('rotas')"><span class="i">🚴</span><b>Rotas</b><span>Cicloturismo Vale dos Ipês</span></button>
      </div>`};
  },
@@ -277,13 +292,16 @@ const TELAS={
   const chips=[['todos','Todos'],['aberto','Aberto agora'],['barato','Até R$ 30']]
     .map(([k,t])=>`<button class="chip ${f===k?'on':''}" onclick="estado.filtro='${k}';render()">${t}</button>`).join('');
   return {top:voltarBtn()+`<h1>Restaurantes</h1><button class="icon-btn" onclick="ir('busca')" aria-label="Buscar">🔍</button>`,
-   html:`<div class="chips">${chips}</div><div class="agora">🕢 Agora: sábado, 19:30</div>
+   html:`<div class="chips">${chips}</div><div class="agora">🕒 Agora: sábado, 15:00</div>
     <div class="lista">${lista.length?lista.map(([id,l])=>cardLugar(id,l)).join(''):vazio('Nenhum restaurante com esse filtro')}</div>`};
  },
  locais(){
-  const lista=Object.entries(LUGARES).filter(([,l])=>l.tipo==='local');
-  return {top:voltarBtn()+`<h1>Locais</h1>`,
-   html:`<div class="agora">🕢 Agora: sábado, 19:30</div><div class="lista">${lista.map(([id,l])=>cardLugar(id,l)).join('')}</div>`};
+  const f=estado.filtroLocais;
+  const lista=Object.entries(LUGARES).filter(([,l])=>l.tipo==='local').filter(([,l])=>f!=='natureza'||l.natureza).filter(([,l])=>f!=='gratis'||l.preco==='Grátis');
+  const chips=[['todos','Todos'],['natureza','Natureza'],['gratis','Grátis']]
+    .map(([k,t])=>`<button class="chip ${f===k?'on':''}" onclick="estado.filtroLocais='${k}';render()">${t}</button>`).join('');
+  return {top:voltarBtn()+`<h1>Locais</h1><button class="icon-btn" onclick="ir('busca')" aria-label="Buscar">🔍</button>`,
+   html:`<div class="chips">${chips}</div><div class="agora">🕒 Agora: sábado, 15:00</div><div class="lista">${lista.length?lista.map(([id,l])=>cardLugar(id,l)).join(''):vazio('Nenhum local com esse filtro')}</div>`};
  },
  lugar({id}){
   const l=LUGARES[id];const fav=estado.favoritos.has(id);
@@ -295,7 +313,7 @@ const TELAS={
     <div class="card" style="margin-top:14px"><div class="infos">
       <div class="info"><span class="i">🕒</span><div>${l.horario}<small>Horário de funcionamento</small></div></div>
       <div class="info"><span class="i">💰</span><div>${l.preco==='Grátis'?'Grátis':l.preco+' · '+l.precoTxt}<small>Preço</small></div></div>
-      <div class="info"><span class="i">📍</span><div>${l.distancia} do centro<small>${l.endereco}</small></div></div>
+      <div class="info"><span class="i">📍</span><div>${l.distancia} de você<small>${l.endereco}</small></div></div>
     </div></div>
     <div class="acoes">
       <button class="btn btn-pri" onclick="ir('chegar',{id:'${id}'})">🧭 Como chegar</button>
@@ -308,15 +326,19 @@ const TELAS={
     .map(([k,i,t])=>`<button class="modo ${m===k?'on':''}" onclick="estado.modo='${k}';render()"><span style="font-size:20px">${i}</span><b>${l.chegar[k].length<9?l.chegar[k]:'·'}</b><span>${t}</span></button>`).join('');
   const longe=l.chegar[m].length>=9;
   return {top:voltarBtn()+`<h1>Como chegar</h1>`,
-   html:`<div class="card" style="margin-bottom:12px"><div class="meta">Do centro de Lavras até</div><b style="font-size:16px">${l.nome}</b><div class="meta">${l.distancia} · ${l.endereco}</div></div>
+   html:`<div class="card" style="margin-bottom:12px"><div class="meta">Da sua localização até</div><b style="font-size:16px">${l.nome}</b><div class="meta">${l.distancia} · ${l.endereco}</div></div>
     <div class="modos">${modos}</div>
     ${longe?`<div class="alerta" style="margin-top:12px">⚠️ <span>${l.chegar[m]}. Escolha carro ou bicicleta.</span></div>`:
      `<div class="sec">Caminho</div><ol class="passos">${l.passos.map(p=>`<li>${p}</li>`).join('')}<li>Você chegou: ${l.nome}</li></ol>`}
     <div class="acoes"><button class="btn btn-pri" onclick="toast('Na versão final, este botão abre o caminho no app de mapas do seu celular.')">Abrir no app de mapas</button></div>`};
  },
  eventos(){
-  return {top:voltarBtn()+`<h1>Eventos</h1>`,
-   html:`<div class="lista">${Object.entries(EVENTOS).map(([id,e])=>`
+  const n=estado.catAvisos.size;
+  return {top:voltarBtn()+`<h1>Eventos</h1><button class="icon-btn" onclick="ir('avisos')" aria-label="Configurar avisos">🔔</button>`,
+   html:`<button class="card item card-btn" onclick="ir('avisos')" style="margin-bottom:12px;background:var(--ipe-claro);border-color:transparent">
+      <div class="thumb" style="background:#fff">🔔</div><div class="txt"><h3>Avisos de eventos</h3>
+      <div class="meta">${n?'Ativos para: '+CATEGORIAS.filter(c=>estado.catAvisos.has(c[0])).map(c=>c[2]).join(', '):'Escolha os tipos de evento sobre os quais quer ser avisado'}</div></div><span class="chev">›</span></button>
+    <div class="lista">${Object.entries(EVENTOS).map(([id,e])=>`
      <button class="card item card-btn" onclick="ir('evento',{id:'${id}'})">
       <div class="thumb" style="background:${e.cor}">${e.icone}</div>
       <div class="txt"><h3>${e.nome}</h3><div class="meta">📅 ${e.quando} · ${e.hora}<br>📍 ${e.lugar}</div>
@@ -336,7 +358,8 @@ const TELAS={
       <div class="info"><span class="i">💰</span><div>${e.preco}</div></div>
     </div></div>
     ${av?`<div class="alerta" style="margin-top:14px">🔔 <span>Aviso ativado. Você vai receber uma notificação 1 dia antes e no dia do evento.</span></div>`:''}
-    <div class="acoes"><button class="btn ${av?'btn-sec btn-on':'btn-pri'}" onclick="avisar('${id}')">${av?'🔔 Aviso ativado (toque para cancelar)':'🔔 Me avise'}</button></div>`};
+    <div class="acoes"><button class="btn ${av?'btn-sec btn-on':'btn-pri'}" onclick="avisar('${id}')">${av?'🔔 Aviso ativado':'🔔 Me avise'}</button>
+      <button class="btn btn-sec ${estado.favoritos.has('e_'+id)?'btn-on':''}" onclick="favoritar('e_${id}')">${estado.favoritos.has('e_'+id)?'♥ Salvo':'♡ Salvar'}</button></div>`};
  },
  rotas(){
   return {top:voltarBtn()+`<h1>Rotas de bike</h1>`,
@@ -369,19 +392,35 @@ const TELAS={
  favoritos(){
   const favs=[...estado.favoritos];const avs=[...estado.avisos];
   const itensFav=favs.map(f=>{
+    if(f.startsWith('e_')){const id=f.slice(2),e=EVENTOS[id];return `<button class="card item card-btn" onclick="ir('evento',{id:'${id}'})"><div class="thumb" style="background:${e.cor}">${e.icone}</div><div class="txt"><h3>${e.nome}</h3><div class="meta">📅 ${e.quando} · ${e.hora}</div></div><span class="chev">›</span></button>`}
     if(f.startsWith('r_')){const id=f.slice(2),r=ROTAS[id];return `<button class="card item card-btn" onclick="ir('rota',{id:'${id}'})"><div class="thumb" style="background:#F1F2EE">🚴</div><div class="txt"><h3>${r.nome}</h3><div class="meta">${r.km} km · ${r.tempo}</div></div><span class="chev">›</span></button>`}
     return cardLugar(f,LUGARES[f]);}).join('');
   const itensAv=avs.map(id=>{const e=EVENTOS[id];return `<button class="card item card-btn" onclick="ir('evento',{id:'${id}'})"><div class="thumb" style="background:${e.cor}">${e.icone}</div><div class="txt"><h3>${e.nome}</h3><div class="meta">🔔 ${e.quando} · ${e.hora}</div></div><span class="chev">›</span></button>`}).join('');
   return {top:`<h1>Salvos</h1>`,
    html:`<div class="sec" style="margin-top:0">Favoritos</div><div class="lista">${itensFav||vazio('Você ainda não salvou nada. Toque em ♡ Salvar em um lugar ou rota.','♡')}</div>
-     <div class="sec">Avisos de eventos</div><div class="lista">${itensAv||vazio('Nenhum aviso ativado. Toque em 🔔 Me avise em um evento.','🔔')}</div>`};
+     <div class="sec">Avisos de eventos</div>
+     ${estado.catAvisos.size?`<button class="card item card-btn" style="margin-bottom:10px" onclick="ir('avisos')"><div class="thumb" style="background:var(--ipe-claro)">🔔</div><div class="txt"><h3>Avisos por tipo de evento</h3><div class="meta">${CATEGORIAS.filter(c=>estado.catAvisos.has(c[0])).map(c=>c[2]).join(', ')} · ${estado.antecedencia}</div></div><span class="chev">›</span></button>`:''}
+     <div class="lista">${itensAv||(estado.catAvisos.size?'':vazio('Nenhum aviso ativado. Toque em 🔔 Me avise em um evento.','🔔'))}</div>`};
  },
  perfil(){
   return {top:`<h1>Perfil</h1>`,
    html:`<div class="card user" style="border-bottom:1px solid var(--linha)"><div class="avatar">U1</div><div><b>Usuário 1</b><div class="meta">Conta de teste do protótipo</div></div></div>
     <div class="card" style="margin-top:10px"><div class="infos">
-     ${['🔔 Notificações','🎯 Meus interesses','🌐 Idioma','❓ Ajuda'].map(t=>`<button class="info" style="width:100%" onclick="emBreve()"><span>${t}</span></button>`).join('')}
+     <button class="info" style="width:100%" onclick="ir('avisos')"><span>🔔 Avisos de eventos</span></button>
+     ${['🌐 Idioma','❓ Ajuda'].map(t=>`<button class="info" style="width:100%" onclick="emBreve()"><span>${t}</span></button>`).join('')}
     </div></div>`};
+ },
+ avisos(){
+  const ant=['No dia do evento','1 dia antes','1 semana antes'];
+  return {top:voltarBtn()+`<h1>Avisos de eventos</h1>`,
+   html:`<p class="meta" style="font-size:14px;margin-bottom:12px">Escolha os tipos de evento. Você recebe uma notificação no celular quando um evento desse tipo for marcado em Lavras.</p>
+    <div class="card"><div class="infos">${CATEGORIAS.map(([k,i,t,d])=>{const on=estado.catAvisos.has(k);return `
+      <button class="info" style="width:100%;align-items:center" onclick="toggleCat('${k}')" role="switch" aria-checked="${on}">
+        <span class="i">${i}</span><div style="flex:1">${t}<small>${d}</small></div>
+        <span class="sw ${on?'on':''}"></span></button>`}).join('')}</div></div>
+    <div class="sec">Quando avisar</div>
+    <div class="chips">${ant.map(a=>`<button class="chip ${estado.antecedencia===a?'on':''}" onclick="estado.antecedencia='${a}';render();toast('Antecedência: ${a.toLowerCase()}.')">${a}</button>`).join('')}</div>
+    ${estado.catAvisos.size?`<div class="alerta">✅ <span>Avisos ativos para: <b>${CATEGORIAS.filter(c=>estado.catAvisos.has(c[0])).map(c=>c[2]).join(', ')}</b>. As alterações são salvas automaticamente.</span></div>`:''}`};
  },
  busca(){
   const q=estado.busca.trim().toLowerCase();
@@ -415,6 +454,12 @@ function avisar(id){
   else{estado.avisos.add(id);toast('Pronto! Vamos te avisar 1 dia antes e no dia do evento.')}
   render();
 }
+function toggleCat(k){
+  const nome=CATEGORIAS.find(c=>c[0]===k)[2];
+  if(estado.catAvisos.has(k)){estado.catAvisos.delete(k);toast('Avisos de '+nome+' desativados.')}
+  else{estado.catAvisos.add(k);toast('Pronto! Você será avisado sobre eventos de '+nome+'.')}
+  render();
+}
 function abrirMenu(){
   const d=$('#drawer'),b=$('#drawerBg');
   d.innerHTML=`<div class="user"><div class="avatar">U1</div><div><b>Usuário 1</b><div class="meta">Conta de teste</div></div></div>
@@ -424,6 +469,7 @@ function abrirMenu(){
    <button onclick="fecharMenu();ir('locais')">📍 Locais</button>
    <button onclick="fecharMenu();ir('rotas')">🚴 Rotas de bike</button>
    <button onclick="fecharMenu();aba('favoritos')">♥ Salvos</button>
+   <button onclick="fecharMenu();ir('avisos')">🔔 Avisos de eventos</button>
    <button onclick="fecharMenu();window.open('https://lvrs.com.br','_blank','noopener')">ℹ️ Sobre o Vale dos Ipês ↗</button>`;
   d.classList.add('open');b.classList.add('open');b.onclick=fecharMenu;
 }
